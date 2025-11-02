@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 安全策略 (CSP) - 临时允许内联样式和脚本以兼容现有代码 -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.example.com wss://api.example.com https://ipapi.co https://api.ipify.org; base-uri 'self'; form-action 'self';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  
+  <meta name="theme-color" content="#1976d2">
+  <meta name="sxml-compiled" content="true">
+  <!-- 防止缓存 -->
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  
+  <title>Navigation Demo</title>
+  
+  <!-- 连接优化：预解析与预连接，降低握手延迟 -->
+  <link rel="dns-prefetch" href="//api.example.com" />
+  <link rel="preconnect" href="https://api.example.com" crossorigin />
+  <link rel="dns-prefetch" href="//ipapi.co" />
+  <link rel="preconnect" href="https://ipapi.co" crossorigin />
+  <link rel="dns-prefetch" href="//api.ipify.org" />
+  <link rel="preconnect" href="https://api.ipify.org" crossorigin />
+  
+  <!-- 预加载关键CSS，防止FOUC（无样式内容闪烁）-->
+  <link rel="preload" href="../../css/element.css" as="style" />
+  <link rel="stylesheet" type="text/css" href="../../css/element.css" />
+  <link rel="preload" href="./demoNav.css" as="style" />
+  <link rel="stylesheet" type="text/css" href="./demoNav.css" />
+  <link rel="icon" href="../../images/logo1.png" type="image/x-icon" />
+  
+  <!-- 防止页面闪烁的内联关键CSS -->
+  <style>
+    /* 首屏淡入 */
+    body { 
+      opacity: 0; 
+      transition: opacity 0.3s ease-in;
+    }
+    body.loaded { 
+      opacity: 1; 
+    }
+    /* 仅隐藏需要替换文本内容的元素，避免把 input/button 等交互控件隐藏 */
+    [data-i18n]:not(input):not(button):not(select):not(textarea),
+    [data-i18n-html]:not(input):not(button):not(select):not(textarea) {
+      visibility: hidden;
+    }
+    .i18n-ready [data-i18n],
+    .i18n-ready [data-i18n-html] {
+      visibility: visible;
+    }
+    /* Bot 检测拒绝访问样式 */
+    .access-denied {
+      padding: 50px;
+      text-align: center;
+    }
+  </style>
+
+</head>
+<body>
+<!-- SXML Compiled at 2025-11-02T21:21:02.792Z -->
+
+<!-- E2E Navigation Demo - Page A -->
+<div class="demo-container">
+  <div class="demo-header">
+    <span class="demo-title">Page() Lifecycle & Navigation API Demo</span>
+    <span class="demo-subtitle">This page demonstrates how to use Page() and wx navigation API</span>
+  </div>
+
+  <div class="demo-section">
+    <span class="section-title">📋 Lifecycle Logs</span>
+    <div class="log-container" id="logContainer">
+      <span class="log-item">Open browser console to see lifecycle logs...</span>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <span class="section-title">🧭 Navigation APIs</span>
+    <div class="button-group">
+      <button class="demo-button" onclick="currentPage.navigateToBack(event)">
+        navigateTo → demoBack
+      </button>
+      <button class="demo-button" onclick="currentPage.redirectToBack(event)">
+        redirectTo → demoBack
+      </button>
+      <button class="demo-button" onclick="currentPage.reLaunchToBack(event)">
+        reLaunch → demoBack
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <span class="section-title">ℹ️ Instructions</span>
+    <span class="instruction-text">
+      1. Open browser DevTools console<br />
+      2. Click any navigation button above<br />
+      3. Observe lifecycle logs in console<br />
+      4. Try navigateBack() in the next page
+    </span>
+  </div>
+</div>
+
+
+  <!-- 动态依赖库（根据页面实际使用智能引入）-->
+    <!-- API 签名映射配置（必须在 config.js 之前加载）-->
+    <script type="text/javascript" src="../../config/api-sign-map.js"></script>
+    <script type="text/javascript" src="../../config/app.config.prod.js"></script>
+    <script>window.APP_CONFIG_URL = '../../config/app.config.prod.js';</script>
+    <script type="text/javascript" src="../../utils/config.js"></script>
+    <script type="text/javascript" src="../../app.js"></script>
+    <script type="text/javascript" src="../../utils/logger.js"></script>
+    <script type="text/javascript" src="../../locales/zh-CN.js"></script>
+    <script type="text/javascript" src="../../utils/i18n.js"></script>
+    <script type="text/javascript" src="../../utils/toast.js"></script>
+    <script>
+      // 确保 Toast 可用（静默回退加载，不输出控制台日志）
+      (function(){
+        try {
+          if (typeof window.ShowToast !== 'function') {
+            fetch('../../utils/toast.js').then(function(r){return r.text();}).then(function(code){ try{ eval(code); }catch(_){ } }).catch(function(){ /* silent */ });
+          }
+        } catch(_) {}
+      })();
+    </script>
+    <script type="text/javascript" src="../../utils/page.js"></script>
+    <script type="text/javascript" src="../../utils/onload.js"></script>
+  <!-- 页面加载器 -->
+    <script>window.SXML_PRECOMPILED = true;</script>
+    <script type="text/javascript" src="../../utils/page.loader.js"></script>
+    
+  <!-- 页面加载完成后显示内容：优先等待 i18n 就绪，最多延迟 800ms -->
+    <script>
+      (function(){
+        // 反爬虫检测：检测自动化工具特征
+        function detectBot() {
+          // 检测 Headless 浏览器
+          if (navigator.webdriver) return true;
+          
+          // 检测 Puppeteer/Playwright
+          if (window.navigator.plugins.length === 0) return true;
+          
+          // 检测常见爬虫 User-Agent
+          const ua = navigator.userAgent.toLowerCase();
+          const botPatterns = ['bot', 'crawl', 'spider', 'scrape', 'python', 'requests', 'urllib', 'scrapy', 'selenium', 'phantomjs'];
+          if (botPatterns.some(pattern => ua.includes(pattern))) return true;
+          
+          // 检测不正常的屏幕尺寸
+          if (screen.width === 0 || screen.height === 0) return true;
+          
+          // 检测缺少常见浏览器对象
+          if (!window.chrome && !window.safari && !window.opera && !/firefox/i.test(ua)) {
+            if (!/edge/i.test(ua) && !/msie|trident/i.test(ua)) return true;
+          }
+          
+          return false;
+        }
+        
+        // 生成设备指纹
+        function generateFingerprint() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          ctx.textBaseline = 'top';
+          ctx.font = '14px Arial';
+          ctx.fillText('browser fingerprint', 2, 2);
+          return canvas.toDataURL().slice(-50);
+        }
+        
+        // 如果检测到机器人，隐藏内容或重定向
+        if (detectBot()) {
+          document.body.innerHTML = '<div class="access-denied"><h1>Access Denied</h1><p>Automated access is not allowed.</p></div>';
+          console.error('Bot detected');
+          return;
+        }
+        
+        // 生成并存储设备指纹（用于后端验证）
+        try {
+          const fp = generateFingerprint();
+          sessionStorage.setItem('_dfp', fp);
+        } catch (e) { /* ignore */ }
+        
+        function reveal(){
+          if (!document.body.classList.contains('loaded')) {
+            document.body.classList.add('loaded');
+          }
+        }
+        // 若 i18n 存在，等待其就绪事件，确保翻译文本已应用再显示
+        if (window.i18n) {
+          if (document.documentElement.classList.contains('i18n-ready')) {
+            reveal();
+          } else {
+            window.addEventListener('i18n:ready', reveal, { once: true });
+            // 兜底：若 800ms 内未就绪也先显示，避免白屏过久
+            setTimeout(reveal, 800);
+          }
+        } else {
+          // 无 i18n 时按 DOMContentLoaded 或立即显示
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', reveal);
+          } else {
+            reveal();
+          }
+        }
+      })();
+    </script>
+</body>
+</html>

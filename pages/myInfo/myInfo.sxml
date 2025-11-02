@@ -1,0 +1,70 @@
+<!-- 个人信息页面（声明式风格，无需引入全局脚本与样式） -->
+
+<view class="container">
+  <!-- 用户卡片 -->
+  <view class="user-card">
+    <view class="user-header">
+      <view class="avatar">
+        <text>{{ userInfo.name && userInfo.name.substring(0,1) }}</text>
+      </view>
+      <view class="user-info">
+        <view class="username">
+          <text>{{ userInfo.name }}</text>
+          <text class="badge vip" s:if="{{userInfo.isVip}}">VIP</text>
+        </view>
+        <view class="user-email">{{ userInfo.email }}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="info-section">
+    <view class="section-title">基本信息</view>
+    <view class="info-item">
+      <text class="info-label">手机号码</text>
+      <text class="info-value">{{ userInfo.phone }}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">用户角色</text>
+      <text class="info-value">{{ userInfo.role }}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">注册时间</text>
+      <text class="info-value">{{ userInfo.registeredDate }}</text>
+    </view>
+  </view>
+
+  <!-- 登录统计 -->
+  <view class="info-section">
+    <view class="section-title">登录统计</view>
+    <view class="info-item">
+      <text class="info-label">登录次数</text>
+      <text class="info-value"><text>{{ userInfo.loginCount }}</text> 次</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">最后登录</text>
+      <text class="info-value">{{ userInfo.lastLoginTime }}</text>
+    </view>
+  </view>
+
+  <!-- 活动统计 -->
+  <view class="info-section">
+    <view class="section-title">活动统计</view>
+    <view class="info-item">
+      <text class="info-label">今日访问</text>
+      <text class="info-value"><text>{{ stats.todayVisits }}</text> 次</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">累计访问</text>
+      <text class="info-value"><text>{{ stats.totalVisits }}</text> 次</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">积分余额</text>
+      <text class="info-value">{{ stats.points }}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <button class="edit-btn" bindtap="handleEdit">编辑个人信息</button>
+  <button class="edit-btn" bindtap="handleLogout" style="margin-top: 10px; background: #ff4444;">退出登录</button>
+</view>

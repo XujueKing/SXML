@@ -1,0 +1,138 @@
+name: CI - Build & Scan
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build SXML pages
+      run: npm run build
+
+    - name: Build distribution
+      run: npm run build:dist
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-${{ matrix.node-version }}
+        path: dist/
+        retention-days: 7
+
+  scan:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build for scanning
+      run: npm run build:dist
+
+    - name: Scan for forbidden terms (WeChat/Mini-Program)
+      run: |
+        echo "🔍 Scanning for WeChat/Mini-Program references..."
+        # Exclude certain directories and docs where examples are allowed
+        if grep -r -E "(微信|小程序|WXML)" \
+          --exclude-dir=node_modules \
+          --exclude-dir=.git \
+          --exclude-dir=removal \
+          --exclude="*.md" \
+          --exclude="SXML_README.md" \
+          --exclude="TEST_SXML_FEATURES.md" \
+          .; then
+          echo "❌ Found forbidden WeChat/Mini-Program references!"
+          exit 1
+        else
+          echo "✅ No WeChat/Mini-Program references found"
+        fi
+
+    - name: Scan for hardcoded ICE branding (source files)
+      run: |
+        echo "🔍 Scanning source for hardcoded ICE branding..."
+        # Check source files (not docs or removal folder) for ICE Markets branding
+        # Allow in: removal/, docs/ (examples), config/app.config.json (comments)
+        if grep -r -E "(ICE Markets|ice-markets-app\.com)" \
+          --include="*.js" \
+          --include="*.json" \
+          --include="*.sxml" \
+          --include="*.css" \
+          --exclude-dir=node_modules \
+          --exclude-dir=.git \
+          --exclude-dir=dist \
+          --exclude-dir=removal \
+          --exclude-dir=docs \
+          --exclude-dir=sxml-highlighter \
+          --exclude="app.config.json" \
+          --exclude="README.md" \
+          --exclude="package.json" \
+          .; then
+          echo "⚠️  Found hardcoded ICE branding in source files - should use {{APP_NAME}} placeholders!"
+          exit 1
+        else
+          echo "✅ No hardcoded ICE branding in source files"
+        fi
+
+    - name: Scan dist output for hardcoded domains
+      run: |
+        echo "🔍 Scanning dist/ for hardcoded API domains..."
+        # After build, dist should NOT contain ice-markets-app.com (should be replaced by config values)
+        # Allow in: locales (will be replaced at runtime by i18n), demoNav/demoBack (examples)
+        if grep -r "ice-markets-app\.com" dist/ \
+          --exclude-dir=locales \
+          --exclude-dir=demoNav \
+          --exclude-dir=demoBack \
+          --exclude="*.js.map" \
+          ; then
+          echo "⚠️  Found hardcoded ice-markets-app.com in dist - config injection may have failed"
+          exit 1
+        else
+          echo "✅ No hardcoded domains in dist output"
+        fi
+
+    - name: Verify config file exists
+      run: |
+        echo "🔍 Checking for config/app.config.json..."
+        if [ ! -f config/app.config.json ]; then
+          echo "❌ config/app.config.json not found!"
+          exit 1
+        else
+          echo "✅ config/app.config.json exists"
+        fi
+
+    - name: Summary
+      run: |
+        echo "✅ All scans passed!"
+        echo "• No WeChat/Mini-Program references found"
+        echo "• No hardcoded branding in source files"
+        echo "• No hardcoded domains in dist output"
+        echo "• Config file present"

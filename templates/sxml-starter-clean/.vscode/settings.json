@@ -1,0 +1,14 @@
+{
+  "files.associations": {
+    "*.sxml": "html"
+  },
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false,
+  "emmet.includeLanguages": {
+    "sxml": "html"
+  },
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "html.autoClosingTags": true,
+  "editor.semanticHighlighting.enabled": true
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="theme-color" content="#000000"> -->
+    <!-- 安全相关 -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.ice-markets-app.com https://ipapi.co https://api.ipify.org http://localhost:3000;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <!-- 预加载关键资源 -->
+    <link rel="preload" href="pages/login/login.css" as="style">
+    <link rel="preload" href="css/element.css" as="style">
+    <link rel="preload" href="utils/jQuery_v3.js" as="script">
+    <link rel="preload" href="utils/aes.js" as="script">
+    <link rel="preload" href="utils/md5.js" as="script">
+    <link rel="preload" href="utils/config.js" as="script">
+    <link rel="preload" href="utils/sapi.js" as="script">
+    <link rel="preload" href="utils/onload.js" as="script">
+    <link rel="preload" href="utils/page.js" as="script">
+    <link rel="preload" href="utils/qrcode.js" as="script">
+    <link rel="preload" href="pages/login/login.js" as="script">
+    <link rel="preload" href="images/logo1.png" as="image">
+    <link rel="preload" href="images/witeCode.png" as="image">
+    <!-- 防止缓存 -->
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <link rel="stylesheet" type="text/css" href="pages/login/login.css" />
+    <link rel="stylesheet" type="text/css" href="css/element.css" />
+    <link rel="icon" href="images/logo1.png" type="image/x-icon" />
+    <title>ICE Markets Management entrance</title>
+    <style type="text/css">
+        html,
+        body {
+            font-family: 'Microsoft YaHei, PingFangSC-Regular, sans-serif;';
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#4b4b4b 0%, #000000 100%);
+            /* background-image: radial-gradient(#475BC8 0%, #121E5A 100%); */
+        }
+    </style>
+    <script type="text/javascript" src="./utils/jQuery_v3.js"></script>
+    <script type="text/javascript" src="./utils/aes.js"></script>
+    <script type="text/javascript" src="./utils/md5.js"></script>
+    <script type="text/javascript" src="./utils/config.js"></script>
+    <script type="text/javascript" src="./utils/i18n.js"></script>
+    <script type="text/javascript" src="./utils/sapi.js"></script>
+    <script type="text/javascript" src="./utils/page.js"></script>
+    <script type="text/javascript" src="./utils/onload.js"></script>
+    <script type="text/javascript" src="./utils/qrcode.js"></script>
+    <script type="text/javascript" src="./pages/login/login.js"></script>
+</head>
+
+<body>
+    <div class="lang-switch">
+        <label for="langSelect" class="visually-hidden">Language Selection</label>
+        <select id="langSelect" onchange="i18n.setLang(this.value)" title="Language / 语言" aria-label="Select Language">
+            <option value="en-US">English</option>
+            <option value="zh-CN">中文</option>
+        </select>
+    </div>
+    <div class="mainpage">
+        <div class="H">
+            <img src="images/logo1.png" class="logo-header" alt="ICE Markets" />
+            <div class="T1">ICE Markets<br>DEX Management entrance</div>
+        </div>
+        <div class="H">
+            <div class="canvas_style" id="canvasId"></div>
+            <label for="u" class="visually-hidden">Mobile Phone Number</label>
+            <input 
+                id="u" 
+                name="u" 
+                type="tel" 
+                inputmode="numeric" 
+                tabindex="2" 
+                placeholder="Please enter mobile phone"
+                title="Mobile Phone Number"
+                aria-label="Mobile Phone Number" 
+                maxlength="11" 
+                pattern="[0-9]{11}" 
+                required 
+                autocomplete="tel"
+                class="ime" 
+                onkeydown="onlyNum(event)" 
+                onfocus="u_onfocus(this.id)" 
+                onblur="u_onblur(this.id)"
+                oninput="this.value=this.value.replace(/\D/g,'')"
+            />
+            <label for="p" class="visually-hidden">Password</label>
+            <input id="p" name="p" tabindex="3" type="password" placeholder="Please enter the password" title="Password" aria-label="Password" value="" class="inputX" autocomplete="new-password" onfocus="u_onfocus(this.id)" onblur="u_onblur(this.id)" onkeydown="login_onkeydown(event)" />
+            <label for="k" class="visually-hidden">Digital Key</label>
+            <input id="k" name="k" type="password" placeholder="digital key（Key）" title="Digital Key" aria-label="Digital Key (32 bytes)" value="" maxlength="32" class="inputX" autocomplete="new-password" onfocus="u_onfocus(this.id)" onblur="u_onblur(this.id)" />
+            <svg id="l" class="lockIcon" viewBox="0 0 1024 1024" onclick="d_lock()" title="After clicking, the key will be uninstalled from this device" role="button" aria-label="Uninstall encryption key"><path d="M 512 88.704 L 149.312 239.424 v 225.088 c 0 54.528 9.536 107.328 28.672 158.72 a 516.48 516.48 0 0 0 202.24 253.696 A 460.8 460.8 0 0 0 512 936.256 a 460.928 460.928 0 0 0 131.712 -59.2 a 517.504 517.504 0 0 0 202.304 -253.76 a 451.52 451.52 0 0 0 28.672 -158.72 V 239.424 L 512 88.704 Z m 448 122.24 v 253.568 c 0 64.64 -11.328 127.424 -33.92 188.352 a 602.368 602.368 0 0 1 -235.52 295.36 A 548.544 548.544 0 0 1 512 1024 a 548.416 548.416 0 0 1 -178.56 -75.776 A 601.664 601.664 0 0 1 97.92 652.8 A 536.192 536.192 0 0 1 64 464.512 V 211.008 c 0 -17.28 10.368 -32.768 26.24 -39.36 L 495.68 3.328 a 42.752 42.752 0 0 1 32.768 0 l 405.312 168.32 c 15.936 6.592 26.304 22.144 26.304 39.36 Z M 460.8 564.416 L 699.712 320 L 768 389.76 L 460.8 704 L 256 494.528 l 68.288 -69.76 L 460.8 564.288 Z"></path></svg>
+            <div id="l2" class="T3">The current device has installed a secure encryption key. Click to log out and reload.</div>
+        </div>
+        <div class="H H1" id="bottomStyle">
+            <button onclick="loginEvent()" id="but" title="Login" aria-label="Login Button">LOGIN</button>
+            <div class="T2">Copyright Reserved © Rainbow Haruko 2026</div>
+            <div class="T2 Top">WEB 3.0 DEX SYSTEM</div>
+        </div>
+        <svg id="b_code" class="barcode" viewBox="0 0 75 75"><path d="M67.875,68.125 L73.749999,68.125 73.749999,74 67.875,74 z M54.5,68.125 L60.375,68.125 60.375,74 54.5,74 z M14,54 L20.5,54 20.5,60.5 14,60.5 z M7,47 L7,67.5 27.5,67.5 27.5,47 z M41,40.625 L60.5,40.625 60.5,53.75 67.375,53.75 67.375,40.875 74.25,40.875 74.25,60.875 54.125,60.875 54.125,47.375 47.125,47.375 47.125,74.25 41,74.25 z M0.5,40.5 L34,40.5 34,74 0.5,74 z M54,14 L60.5,14 60.5,20.5 54,20.5 z M14,14 L20.5,14 20.5,20.5 14,20.5 z M47,7 L47,27.5 67.5,27.5 67.5,7 z M7,7 L7,27.5 27.5,27.5 27.5,7 z M40.5,0.5 L74,0.5 74,34 40.5,34 z M0.5,0.5 L34,0.5 34,34 0.5,34 z"></path></svg>
+        <svg id="b_code2" class="barcode" viewBox="0 0 1024 1024"><path d="M 147.012 430.89 c -44.791 0 -81.109 36.305 -81.109 81.11 c 0 44.779 36.317 81.108 81.109 81.108 c 44.792 0 81.109 -36.33 81.109 -81.108 c 0 -44.805 -36.316 -81.11 -81.11 -81.11 Z m 364.987 0 c -44.79 0 -81.108 36.305 -81.108 81.11 c 0 44.779 36.316 81.108 81.108 81.108 c 44.793 0 81.11 -36.33 81.11 -81.108 c 0 -44.805 -36.317 -81.11 -81.11 -81.11 Z m 364.988 0 c -44.79 0 -81.108 36.305 -81.108 81.11 c 0 44.779 36.316 81.108 81.108 81.108 s 81.109 -36.33 81.109 -81.108 c -0.002 -44.805 -36.318 -81.11 -81.109 -81.11 Z"></path></svg>
+        <img id="b_code3" src="images/witeCode.png" class="barcode2" alt="" title="Click to switch to scan code login" onclick="enterCode()" />
+
+    </div>
+</body>
+
+</html>

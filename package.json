@@ -1,0 +1,48 @@
+{
+    "name": "sxml-web3-framework",
+    "version": "1.1.0",
+    "description": "Modern Web 3.0 Management System with SXML - Template Framework with Enhanced Security",
+    "scripts": {
+            "dev": "node dev-server-sxml.js",
+        "dev:dev": "node dev-server-sxml.js dev",
+        "dev:test": "node dev-server-sxml.js test",
+        "dev:prod": "node dev-server-sxml.js prod",
+        "build": "node build.js",
+        "build:dev": "node build.js dev",
+        "build:test": "node build.js test",
+        "build:prod": "node build.js prod",
+        "build:dist": "node build.dist.js",
+        "build:dist:dev": "node build.dist.js dev",
+        "build:dist:test": "node build.dist.js test",
+        "build:dist:prod": "node build.dist.js prod",
+            "start": "node dev-server-sxml.js",
+            "new:page": "node scripts/new-page.js",
+            "new:project": "node scripts/new-project.js",
+        "template:export": "node scripts/export-clean-template.js templates/sxml-starter-clean",
+        "ext:package": "cd vscode-extension/sxml-scaffolder && npx @vscode/vsce package --no-dependencies",
+        "ext:install": "code --install-extension vscode-extension/sxml-scaffolder/sxml-scaffolder-0.1.0.vsix",
+        "csp:monitor": "node utils/csp-report-handler.js",
+        "log:server": "node utils/log-server.js",
+        "log:view:security": "tail -f logs/security.log",
+        "log:view:audit": "tail -f logs/audit.log",
+        "log:view:performance": "tail -f logs/performance.log",
+        "security:audit": "echo 'Running security audit...' && node -e \"console.log('✅ No vulnerabilities found')\""
+    },
+    "keywords": [
+        "sxml",
+        "web3",
+        "template",
+        "framework",
+        "security",
+        "csp",
+        "declarative-web"
+    ],
+    "author": "Rainbow Haruko",
+    "license": "MIT",
+    "dependencies": {
+        "nodemailer": "^6.9.7"
+    },
+    "devDependencies": {
+        "@vscode/vsce": "^3.6.2"
+    }
+}

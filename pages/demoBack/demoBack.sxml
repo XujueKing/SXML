@@ -1,0 +1,35 @@
+<!-- E2E Navigation Demo - Page B -->
+<view class="demo-container">
+  <view class="demo-header">
+    <text class="demo-title">You navigated to demoBack!</text>
+    <text class="demo-subtitle">From: {{sourceMethod}}</text>
+  </view>
+
+  <view class="demo-section">
+    <text class="section-title">📋 Lifecycle Logs</text>
+    <view class="log-container" id="logContainer">
+      <text class="log-item">Check browser console for lifecycle logs...</text>
+    </view>
+  </view>
+
+  <view class="demo-section">
+    <text class="section-title">⬅️ Navigate Back</text>
+    <view class="button-group">
+      <button class="demo-button" bindtap="goBack">
+        wx.navigateBack() - Return to previous page
+      </button>
+      <button class="demo-button secondary" bindtap="goHome">
+        reLaunch to demoNav (clear history)
+      </button>
+    </view>
+  </view>
+
+  <view class="demo-section">
+    <text class="section-title">ℹ️ Note</text>
+    <text class="instruction-text">
+      • If you arrived via redirectTo or reLaunch, navigateBack will not work (no history)<br />
+      • If you arrived via navigateTo, navigateBack will return you to the previous page<br />
+      • Check the console to see when onShow fires again
+    </text>
+  </view>
+</view>

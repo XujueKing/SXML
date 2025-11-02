@@ -1,0 +1,39 @@
+<!-- E2E Navigation Demo - Page A -->
+<view class="demo-container">
+  <view class="demo-header">
+    <text class="demo-title">Page() Lifecycle & Navigation API Demo</text>
+    <text class="demo-subtitle">This page demonstrates how to use Page() and wx navigation API</text>
+  </view>
+
+  <view class="demo-section">
+    <text class="section-title">📋 Lifecycle Logs</text>
+    <view class="log-container" id="logContainer">
+      <text class="log-item">Open browser console to see lifecycle logs...</text>
+    </view>
+  </view>
+
+  <view class="demo-section">
+    <text class="section-title">🧭 Navigation APIs</text>
+    <view class="button-group">
+      <button class="demo-button" bindtap="navigateToBack">
+        navigateTo → demoBack
+      </button>
+      <button class="demo-button" bindtap="redirectToBack">
+        redirectTo → demoBack
+      </button>
+      <button class="demo-button" bindtap="reLaunchToBack">
+        reLaunch → demoBack
+      </button>
+    </view>
+  </view>
+
+  <view class="demo-section">
+    <text class="section-title">ℹ️ Instructions</text>
+    <text class="instruction-text">
+      1. Open browser DevTools console<br />
+      2. Click any navigation button above<br />
+      3. Observe lifecycle logs in console<br />
+      4. Try navigateBack() in the next page
+    </text>
+  </view>
+</view>

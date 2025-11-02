@@ -1,0 +1,21 @@
+{
+  "name": "sxml-highlighter",
+  "displayName": "SXML Highlighter",
+  "description": "Syntax highlighting injections for SXML (s-if / s-show / s-for, bind* events, and {{ }} bindings).",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": ">=1.74.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "grammars": [
+      {
+        "language": "html",
+        "scopeName": "sxml.attributes.injection",
+        "path": "./syntaxes/sxml-injection.tmLanguage.json",
+        "injectTo": ["text.html.basic"]
+      }
+    ]
+  }
+}

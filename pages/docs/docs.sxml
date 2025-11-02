@@ -1,0 +1,79 @@
+<view class="docs-container">
+  <!-- 顶部导航栏 -->
+  <view class="docs-header">
+    <view class="header-content">
+      <view class="logo">
+        <text class="logo-text">SXML</text>
+        <text class="logo-subtitle">框架文档</text>
+      </view>
+      <view class="header-search">
+        <input type="text" 
+               placeholder="搜索文档..."
+               bind:input="onSearchInput"
+               class="search-input"
+               id="search-input" />
+        <text class="search-icon">🔍</text>
+      </view>
+      <view class="header-actions">
+        <button bind:tap="toggleTheme" class="theme-toggle" id="theme-btn">🌙</button>
+        <a href="https://github.com/XujueKing/SXML" target="_blank" class="github-link">GitHub</a>
+      </view>
+    </view>
+  </view>
+
+  <!-- 主内容区 -->
+  <view class="docs-main">
+    <!-- 侧边栏导航 -->
+    <view class="docs-sidebar" id="sidebar">
+      <view class="sidebar-content" id="sidebar-nav">
+        <!-- 导航内容将通过 JavaScript 动态生成 -->
+      </view>
+
+      <!-- 侧边栏切换按钮（移动端） -->
+      <button class="sidebar-toggle" bind:tap="toggleSidebar" id="sidebar-toggle-btn">
+        <text>☰</text>
+      </button>
+    </view>
+
+    <!-- 文档内容区 -->
+    <view class="docs-content">
+      <view class="content-wrapper">
+        <!-- 面包屑导航 -->
+        <view class="breadcrumb" id="breadcrumb"></view>
+
+        <!-- Markdown 渲染区域 -->
+        <view class="markdown-body" id="markdown-content">
+          <view class="loading" id="loading-indicator">
+            <text>加载中...</text>
+          </view>
+          <view class="error" id="error-message">
+            <text></text>
+          </view>
+        </view>
+
+        <!-- 文档底部导航 -->
+        <view class="doc-footer" id="doc-footer">
+          <view class="footer-nav" id="footer-nav"></view>
+          <view class="footer-meta">
+            <text class="update-time" id="update-time"></text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 右侧目录（页内锚点） -->
+      <view class="docs-toc" id="docs-toc">
+        <view class="toc-title">目录</view>
+        <view class="toc-items" id="toc-items"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索结果浮层 -->
+  <view class="search-results" id="search-results">
+    <view class="results-header">
+      <text id="search-result-count"></text>
+      <button bind:tap="closeSearch" class="close-btn">✕</button>
+    </view>
+    <view class="results-list" id="search-results-list"></view>
+  </view>
+</view>
