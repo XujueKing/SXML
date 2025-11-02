@@ -1,0 +1,62 @@
+{
+  "name": "sxml-scaffolder",
+  "displayName": "SXML Scaffolder",
+  "description": "轻量脚手架：一键新建 SXML 页面与空白项目",
+  "version": "0.1.0",
+  "publisher": "local",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/sxml-framework"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "files": [
+    "extension.js",
+    "package.json",
+    "README.md"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "sxmlScaffolder.newPage",
+        "title": "SXML: 新建页面",
+        "category": "SXML"
+      },
+      {
+        "command": "sxmlScaffolder.newProject",
+        "title": "SXML: 新建空白项目",
+        "category": "SXML"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "sxmlScaffolder.newPage", "when": "true" },
+        { "command": "sxmlScaffolder.newProject", "when": "true" }
+      ],
+      "explorer/context": [
+        {
+          "command": "sxmlScaffolder.newPage",
+          "group": "navigation@3",
+          "when": "explorerResourceIsFolder"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "SXML Scaffolder",
+      "properties": {
+        "sxmlScaffolder.newProjectScriptPath": {
+          "type": "string",
+          "default": "scripts/new-project.js",
+          "description": "用于新建项目的脚本路径，默认使用当前工作区内的 scripts/new-project.js"
+        }
+      }
+    }
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "sxml-starter-clean",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node dev-server-sxml.js",
+    "dev:dev": "node dev-server-sxml.js dev",
+    "dev:test": "node dev-server-sxml.js test",
+    "dev:prod": "node dev-server-sxml.js prod",
+    "build": "node build.js",
+    "build:dev": "node build.js dev",
+    "build:test": "node build.js test",
+    "build:prod": "node build.js prod",
+    "build:dist": "node build.dist.js",
+    "build:dist:dev": "node build.dist.js dev",
+    "build:dist:test": "node build.dist.js test",
+    "build:dist:prod": "node build.dist.js prod"
+  }
+}
