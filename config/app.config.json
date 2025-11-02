@@ -1,0 +1,31 @@
+{
+  "app": {
+    "name": "Your App Name",
+    "title": "Your App Management",
+    "subtitle": "Management System",
+    "description": "Your app description"
+  },
+  "api": {
+    "baseUrl": "https://api.example.com",
+    "cspReportUrl": "/api/csp-report"
+  },
+  "external": {
+    "ipGeoProvider": "https://ipapi.co",
+    "ipApiProvider": "https://api.ipify.org"
+  },
+  "security": {
+    "connectSrc": [
+      "https://api.example.com"
+    ],
+    "preconnectHosts": [
+      "https://api.example.com"
+    ]
+  },
+  "i18n": {
+    "defaultLocale": "zh-CN",
+    "supportedLocales": [
+      "zh-CN",
+      "en-US"
+    ]
+  }
+}
