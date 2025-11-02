@@ -1,0 +1,11 @@
+/* 首页样式 */
+.container { max-width: 960px; margin: 40px auto; padding: 0 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+.hero { text-align: center; margin: 48px 0 36px; }
+.hero .logo image, .hero .logo img { width: 80px; height: 80px; object-fit: contain; }
+.hero .title { font-size: 28px; font-weight: 700; margin-top: 12px; }
+.hero .subtitle { font-size: 16px; opacity: .75; margin-top: 6px; }
+.hero .desc { font-size: 14px; opacity: .7; margin-top: 10px; }
+.actions { display: flex; gap: 12px; justify-content: center; margin: 24px 0 12px; }
+.actions .primary { background: #2b6ff7; color: #fff; border-radius: 8px; border: none; padding: 10px 16px; cursor: pointer; }
+.actions .secondary { background: #f2f3f5; color: #333; border-radius: 8px; border: none; padding: 10px 16px; cursor: pointer; }
+.footnote { text-align: center; font-size: 12px; opacity: .6; margin-top: 40px; }

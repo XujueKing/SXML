@@ -1,0 +1,20 @@
+{
+  "name": "SXML Injection",
+  "scopeName": "sxml.attributes.injection",
+  "injectionSelector": "L:meta.tag - string - comment, L:meta.embedded - string - comment, L:text.html.basic - string - comment",
+  "patterns": [
+    {
+      "name": "entity.other.attribute-name.sxml.directive",
+      "match": "\\b(s[:\\-](?:if|show|for|else(?:-if)?))\\b"
+    },
+    {
+      "name": "support.type.property-name.sxml.event",
+      "match": "\\b(bind[a-zA-Z0-9_]+)\\b"
+    },
+    {
+      "name": "variable.other.sxml.binding",
+      "match": "\\{\\{[^}]+\\}\\}"
+    }
+  ],
+  "repository": {}
+}
