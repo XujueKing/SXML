@@ -4,7 +4,7 @@
 >
 > **全新的适应 Web 3.0 开发框架** - 基于 SXML 模板引擎 + 响应式数据系统
 
-**开发者**: King, Rainbow Haruko
+**开发者**: Rainbow Haruko
 
 **📖 [在线文档](pages/docs/docs.html)** | **🚀 [快速开始](#快速开始)** | **💡 [GitHub](https://github.com/XujueKing/SXML)**
 
