@@ -1,0 +1,11 @@
+<!-- webapp 页面（SXML 模板） -->
+
+<view class="container">
+  <view class="header">
+    <text class="title">{{ pageTitle }}</text>
+  </view>
+
+  <view class="content">
+    <text>这里是 webapp 页面内容。</text>
+  </view>
+</view>

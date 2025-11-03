@@ -1,0 +1,145 @@
+/* Webapp 私有样式（不包含任何全局变量或重置，已迁移到 css/app.css） */
+.webapp-root{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:linear-gradient(180deg,#071025 0%, #0f1724 100%);
+  color:var(--text);
+  padding:0; /* 去除外层留白 */
+}
+/* 全局重置：去掉 body 默认 margin/padding，确保背景色充满视口，避免白边 */
+html,body{height:100%;margin:0;padding:0;background:var(--bg)}
+*,*::before,*::after{box-sizing:border-box}
+.topbar{
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between; /* 左 logo, 中心标题, 右操作 */
+  font-weight:600;
+  font-size:16px;
+  padding:0 12px;
+}
+/* 主题切换按钮样式 */
+.theme-toggle{
+  margin-left:12px;
+  background:transparent;
+  border:0;
+  color:var(--text);
+  font-size:18px;
+  cursor:pointer;
+  padding:6px 8px;
+}
+.theme-toggle:active{opacity:0.8}
+.content{
+  flex:1 1 auto;
+  overflow:hidden; /* 内容区由子 .page 自身滚动 */
+  padding:0; /* 去掉外侧内边距，页面内容可由 card 等内部组件控制内边距 */
+  position:relative; /* 让 .page 绝对定位基于此容器 */
+}
+
+/* Topbar logo positioning */
+.logo-wrap{padding: 0 20px;width:100%;display:flex;align-items:center;justify-content:space-between}
+.logo-wrap img{height:40rem;max-height:40px;width:auto;display:inline-block}
+/* rpx 是小程序/特定框架的单位，浏览器不支持；使用 px/rem/vw 等标准单位以保证跨浏览器兼容 */
+.logo-day{display:none}
+.logo-night{display:inline-block}
+/* 当页面或根元素存在 .theme-day 时，显示日间 logo，隐藏夜间 logo。增加多个选择器并提高优先级以确保在不同注入点生效 */
+html.theme-day .logo-day, body.theme-day .logo-day, .theme-day .logo-day, :root.theme-day .logo-day { display:inline-block !important }
+html.theme-day .logo-night, body.theme-day .logo-night, .theme-day .logo-night, :root.theme-day .logo-night { display:none !important }
+.topbar .title{flex:1;text-align:center}
+.hero{padding:12px 6px 18px 6px}
+.hero-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.hero-sub{color:var(--muted);font-size:13px}
+.card-list{display:flex;gap:10px;margin-top:12px}
+.card{flex:1;background:rgba(255,255,255,0.03);padding:14px;border-radius:8px;text-align:center}
+
+/* Banner */
+.banner{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));margin:8px 0}
+.banner-left{display:flex;flex-direction:column}
+.banner-title{font-size:16px;font-weight:700}
+.banner-sub{font-size:12px;color:var(--muted)}
+.banner-right{display:flex;align-items:center}
+.ticker{font-size:14px;color:var(--text);font-weight:700}
+.ticker-price{color:var(--accent);margin-left:6px}
+
+/* 功能入口网格（四宫格） */
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.feature-item{background:rgba(255,255,255,0.02);border-radius:10px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0;color:var(--text);cursor:pointer}
+.feature-icon{font-size:20px;margin-bottom:6px}
+.feature-label{font-size:12px;color:var(--muted)}
+
+/* Most Active 列表 */
+.most-active{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.active-row{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:10px}
+.active-row .sym{font-weight:600}
+.active-row .meta{display:flex;gap:8px;align-items:center}
+.active-row .price{font-weight:700;color:var(--text)}
+.active-row .change{font-size:12px}
+.price-up{color:#3ccF6b /* bright green */}
+.price-down{color:#ff6b6b /* soft red */}
+.section-title{font-size:15px;margin:8px 0 10px 0;font-weight:600}
+.market-list{display:flex;flex-direction:column;gap:8px}
+.market-row{display:flex;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:8px}
+.market-row .price{color:var(--accent);font-weight:600}
+.trade-panel,.funds-panel{padding:12px;background:rgba(255,255,255,0.02);border-radius:8px}
+
+/* 底部 tabbar */
+.tabbar{
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  border-top:1px solid rgba(255,255,255,0.03);
+  background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.12));
+  padding:6px 0;
+}
+.tab{background:none;border:0;outline:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;font-size:12px}
+.tab:active{opacity:0.8}
+.tab-icon{font-size:20px;margin-bottom:4px}
+.tab-label{font-size:11px}
+
+/* 页面切换过渡动画：使用 opacity + transform 做简单淡入位移动画 */
+.page{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  overflow:auto;
+  padding:12px; /* 页面内边距，保留视觉间距 */
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .22s ease, transform .22s ease;
+  pointer-events:none;
+}
+.page.active{
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:auto;
+}
+
+/* 运行时显示控制 (兼容旧的 hidden 类作为后备)
+   推荐在运行时移除 hidden 并使用 .active 控制可见性以便保留动画 */
+.hidden{display:none}
+
+/* 激活态样式 */
+.tab.active{color:var(--text)}
+.tab.active .tab-icon{color:var(--accent)}
+
+/* 响应式适配：在更大屏幕上居中显示最大宽度 */
+@media(min-width:700px){
+  .webapp-root{align-items:center}
+  .content{max-width:720px;width:100%}
+  .topbar{width:100%;max-width:720px}
+  .tabbar{max-width:720px;width:100%}
+}
+/* webapp 页面样式 */
+.container{ padding: 16px; }
+.title{ font-size: 20px; font-weight: 700; }
+
+/* 小屏优化：保证元素在低宽度下友好显示 */
+@media(max-width:420px){
+  .feature-grid{grid-template-columns:repeat(4,1fr);gap:6px}
+  .feature-item{padding:8px;border-radius:8px}
+  .banner{padding:10px}
+}
