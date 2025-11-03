@@ -4,130 +4,202 @@
  * API 签名映射从 config/api-sign-map.js 加载
  */
 (function() {
-  'use strict';
+	'use strict';
 
-  // 检测当前环境
-  const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+	// 检测当前环境
+	const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   
-  // 默认配置（在未加载外部 config 时的回退值）
-  const DEFAULT_CONFIG = {
-    BASE_URL: isDev ? '' : 'https://api.example.com',
-    SIGN_MAP: {}  // 将从 config/api-sign-map.js 加载
-  };
+	// 默认配置（在未加载外部 config 时的回退值）
+	const DEFAULT_CONFIG = {
+		BASE_URL: isDev ? '' : 'https://api.example.com',
+		SIGN_MAP: {}  // 将从 config/api-sign-map.js 加载
+	};
 
-  // 初始化全局配置为默认值
-  window.API_CONFIG = Object.assign({}, DEFAULT_CONFIG);
+	// 初始化全局配置为默认值
+	window.API_CONFIG = Object.assign({}, DEFAULT_CONFIG);
 
-  // 异步加载外部配置并合并（仅 JS；无 JSON 请求）
-  (async function loadExternalConfig() {
-    const configUrl = window.APP_CONFIG_URL || '../../config/app.config.js';
+	// 主题切换 API：暴露到全局，供页面调用
+	window.setAppTheme = function(mode) {
+		try {
+			const m = (mode || '').toString().toLowerCase();
+			// 临时调试日志：在浏览器控制台打印主题变更（开发用，可在确认后移除）
+			try { console.info('[setAppTheme] requested mode=', m); } catch (_) {}
+			// 同步在 documentElement 与 body 上设置 class，避免作用域不一致导致切换失败
+			const root = document.documentElement;
+			const body = document.body;
+			if (m === 'day' || m === 'light') {
+				try { if (root && !root.classList.contains('theme-day')) root.classList.add('theme-day'); } catch(_) {}
+				try { if (body && !body.classList.contains('theme-day')) body.classList.add('theme-day'); } catch(_) {}
+				try { console.info('[setAppTheme] applied .theme-day to', root===document.documentElement ? 'documentElement' : 'root', body ? 'body present' : 'no body'); } catch(_) {}
+			} else {
+				try { if (root && root.classList.contains('theme-day')) root.classList.remove('theme-day'); } catch(_) {}
+				try { if (body && body.classList.contains('theme-day')) body.classList.remove('theme-day'); } catch(_) {}
+				try { console.info('[setAppTheme] removed .theme-day'); } catch(_) {}
+			}
+			try { localStorage.setItem('app.theme', m); } catch (_) {}
+					// 派发主题变更事件，页面可监听以更新徽标等运行时元素
+					try { 
+						var ev = new CustomEvent('app:theme-changed', { detail: { theme: m } });
+						if (window && window.dispatchEvent) window.dispatchEvent(ev);
+						if (document && document.dispatchEvent) document.dispatchEvent(ev);
+					} catch (_) {}
+		} catch (e) {
+			console.warn('setAppTheme failed', e);
+		}
+	};
 
-    // 应用配置到全局（避免重复代码）
-    const applyAppConfig = (appConfig) => {
-      if (!appConfig || typeof appConfig !== 'object') return false;
-      // 合并配置：生产环境使用 api.baseUrl，开发环境保持空串（走代理）
-      if (appConfig.api && appConfig.api.baseUrl && !isDev) {
-        window.API_CONFIG.BASE_URL = appConfig.api.baseUrl;
-      }
-      window.APP_CONFIG = appConfig;
-      console.log('📡 API_CONFIG 已加载:', window.API_CONFIG);
-      return true;
-    };
+	// 异步加载外部配置并合并（仅 JS；无 JSON 请求）
+	(async function loadExternalConfig() {
+		const configUrl = window.APP_CONFIG_URL || '../../config/app.config.js';
 
-    try {
-      // 1) 若页面已提前注入 window.APP_CONFIG（通过 app.config.js），直接使用
-      if (window.APP_CONFIG && applyAppConfig(window.APP_CONFIG)) return;
+		// 应用配置到全局（避免重复代码）
+		const applyAppConfig = (appConfig) => {
+			if (!appConfig || typeof appConfig !== 'object') return false;
+			// 合并配置：生产环境使用 api.baseUrl，开发环境保持空串（走代理）
+			if (appConfig.api && appConfig.api.baseUrl && !isDev) {
+				window.API_CONFIG.BASE_URL = appConfig.api.baseUrl;
+			}
+			window.APP_CONFIG = appConfig;
+			// 如果配置中包含 theme 或 themeMode，优先应用
+			try {
+				const themeVal = (appConfig.theme || appConfig.themeMode || '').toString();
+				if (themeVal) window.setAppTheme(themeVal.toLowerCase());
+			} catch (_) {}
+			console.log('📡 API_CONFIG 已加载:', window.API_CONFIG);
+			return true;
+		};
 
-      // 2) 优先尝试加载 JS 版本（无网络开销的 JSON.parse，浏览器对 <script> 命中缓存更高效）
-  const jsUrl = /\.js($|[?#])/i.test(configUrl) ? configUrl : configUrl.replace(/\.json(?![^#?]*\.)/i, '.js');
-      const tryLoadJs = () => new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = jsUrl;
-        script.async = false;
-        // 继承 CSP Nonce
-        try {
-          const current = (document.currentScript && (document.currentScript.nonce || document.currentScript.getAttribute && document.currentScript.getAttribute('nonce'))) || null;
-          const existNonceEl = document.querySelector && document.querySelector('script[nonce]');
-          const detectedNonce = current || (existNonceEl && (existNonceEl.nonce || existNonceEl.getAttribute('nonce')));
-          if (detectedNonce) script.setAttribute('nonce', detectedNonce);
-        } catch (_) {}
-        script.onload = () => resolve(true);
-        script.onerror = () => resolve(false);
-        document.head.appendChild(script);
-      });
+		try {
+			// 1) 若页面已提前注入 window.APP_CONFIG（通过 app.config.js），直接使用
+			if (window.APP_CONFIG && applyAppConfig(window.APP_CONFIG)) return;
 
-  const jsOk = await tryLoadJs();
-  if (jsOk && window.APP_CONFIG && applyAppConfig(window.APP_CONFIG)) return;
-  // 无 JS 配置则保持默认
-  console.warn('⚠️  未找到 JS 配置，继续使用默认配置');
-    } catch (e) {
-      console.warn('⚠️  无法加载外部配置，使用默认配置:', e && e.message || e);
-      console.log('📡 API_CONFIG（默认）:', window.API_CONFIG);
-    }
-  })();
+			// 2) 优先尝试加载 JS 版本（无网络开销的 JSON.parse，浏览器对 <script> 命中缓存更高效）
+	const jsUrl = /\.js($|[?#])/i.test(configUrl) ? configUrl : configUrl.replace(/\.json(?![^#?]*\.)/i, '.js');
+			const tryLoadJs = () => new Promise((resolve) => {
+				const script = document.createElement('script');
+				script.type = 'text/javascript';
+				script.src = jsUrl;
+				script.async = false;
+				// 继承 CSP Nonce
+				try {
+					const current = (document.currentScript && (document.currentScript.nonce || document.currentScript.getAttribute && document.currentScript.getAttribute('nonce'))) || null;
+					const existNonceEl = document.querySelector && document.querySelector('script[nonce]');
+					const detectedNonce = current || (existNonceEl && (existNonceEl.nonce || existNonceEl.getAttribute('nonce')));
+					if (detectedNonce) script.setAttribute('nonce', detectedNonce);
+				} catch (_) {}
+				script.onload = () => resolve(true);
+				script.onerror = () => resolve(false);
+				document.head.appendChild(script);
+			});
 
-  // 加载 API 签名映射（带回退动态加载）
-  (function loadSignMap() {
-    try {
-      const applyMap = () => {
-        if (window.API_SIGN_MAP && typeof window.API_SIGN_MAP === 'object') {
-          window.API_CONFIG.SIGN_MAP = window.API_SIGN_MAP;
-          console.log('📝 API_SIGN_MAP 已加载:', Object.keys(window.API_CONFIG.SIGN_MAP).length, '个接口');
-          return true;
-        }
-        return false;
-      };
+	const jsOk = await tryLoadJs();
+	if (jsOk && window.APP_CONFIG && applyAppConfig(window.APP_CONFIG)) return;
+	// 无 JS 配置则保持默认
+	console.warn('⚠️  未找到 JS 配置，继续使用默认配置');
+		} catch (e) {
+			console.warn('⚠️  无法加载外部配置，使用默认配置:', e && e.message || e);
+			console.log('📡 API_CONFIG（默认）:', window.API_CONFIG);
+		}
+	})();
 
-      // 情况1：已在页面中通过 <script src="../../config/api-sign-map.js"> 预先加载
-      if (applyMap()) return;
+	// 页面初始时恢复主题：localStorage 优先，其次尝试使用 window.APP_CONFIG，再次尝试系统首选项
+	try {
+		const stored = (function(){ try { return localStorage.getItem('app.theme'); } catch(_) { return null } })();
+		if (stored) {
+			window.setAppTheme(stored);
+		} else if (window.APP_CONFIG && (window.APP_CONFIG.theme || window.APP_CONFIG.themeMode)) {
+			window.setAppTheme((window.APP_CONFIG.theme || window.APP_CONFIG.themeMode).toString().toLowerCase());
+		} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+			window.setAppTheme('day');
+		}
+	} catch (_) {}
 
-      // 情况2：尝试查找是否已有正在加载的脚本标签
-      const existing = Array.from(document.getElementsByTagName('script') || [])
-        .find(s => s.src && /\/config\/api-sign-map\.js(?:$|[?#])/i.test(s.src));
-      if (existing) {
-        // 若已存在脚本，监听其 onload/onerror，再次尝试应用
-        existing.addEventListener('load', () => applyMap());
-        existing.addEventListener('error', () => console.warn('⚠️  api-sign-map.js 脚本加载失败'));
-        // 同时设置一个短轮询，避免错过 load 事件
-        let tries = 0;
-        const timer = setInterval(() => {
-          tries++;
-          if (applyMap() || tries > 20) clearInterval(timer);
-        }, 100);
-        return;
-      }
+	// 加载 API 签名映射（带回退动态加载）
+	(function loadSignMap() {
+		try {
+			const applyMap = () => {
+				if (window.API_SIGN_MAP && typeof window.API_SIGN_MAP === 'object') {
+					window.API_CONFIG.SIGN_MAP = window.API_SIGN_MAP;
+					console.log('📝 API_SIGN_MAP 已加载:', Object.keys(window.API_CONFIG.SIGN_MAP).length, '个接口');
+					return true;
+				}
+				return false;
+			};
 
-      // 情况3：动态加载回退（相对页面路径）
-      if (!window.__SIGN_MAP_LOADING__) {
-        window.__SIGN_MAP_LOADING__ = true;
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = '../../config/api-sign-map.js';
-        script.async = false; // 保持顺序，尽量在后续逻辑前完成
-        // 继承页面 CSP Nonce（若存在）
-        try {
-          const current = (document.currentScript && (document.currentScript.nonce || document.currentScript.getAttribute && document.currentScript.getAttribute('nonce'))) || null;
-          const existNonceEl = document.querySelector && document.querySelector('script[nonce]');
-          const detectedNonce = current || (existNonceEl && (existNonceEl.nonce || existNonceEl.getAttribute('nonce')));
-          if (detectedNonce) script.setAttribute('nonce', detectedNonce);
-        } catch (_) {}
-        script.onload = () => {
-          if (applyMap()) {
-            console.log('📝 API_SIGN_MAP 动态注入完成');
-          }
-          window.__SIGN_MAP_LOADING__ = false;
-        };
-        script.onerror = () => {
-          console.warn('⚠️  无法加载 ../../config/api-sign-map.js，请检查路径与 CSP');
-          window.__SIGN_MAP_LOADING__ = false;
-        };
-        document.head.appendChild(script);
-        console.warn('ℹ️  API_SIGN_MAP 未预加载，已尝试动态注入 ../../config/api-sign-map.js');
-      }
-    } catch (e) {
-      console.error('❌ 加载 API_SIGN_MAP 失败:', e && e.message || e);
-    }
-  })();
+			// 情况1：已在页面中通过 <script src="../../config/api-sign-map.js"> 预先加载
+			if (applyMap()) return;
+
+			// 情况2：尝试查找是否已有正在加载的脚本标签
+			const existing = Array.from(document.getElementsByTagName('script') || [])
+				.find(s => s.src && /\/config\/api-sign-map\.js(?:$|[?#])/i.test(s.src));
+			if (existing) {
+				// 若已存在脚本，监听其 onload/onerror，再次尝试应用
+				existing.addEventListener('load', () => applyMap());
+				existing.addEventListener('error', () => console.warn('⚠️  api-sign-map.js 脚本加载失败'));
+				// 同时设置一个短轮询，避免错过 load 事件
+				let tries = 0;
+				const timer = setInterval(() => {
+					tries++;
+					if (applyMap() || tries > 20) clearInterval(timer);
+				}, 100);
+				return;
+			}
+
+			// 情况3：动态加载回退（相对页面路径）
+			if (!window.__SIGN_MAP_LOADING__) {
+				window.__SIGN_MAP_LOADING__ = true;
+				const script = document.createElement('script');
+				script.type = 'text/javascript';
+				script.src = '../../config/api-sign-map.js';
+				script.async = false; // 保持顺序，尽量在后续逻辑前完成
+				// 继承页面 CSP Nonce（若存在）
+				try {
+					const current = (document.currentScript && (document.currentScript.nonce || document.currentScript.getAttribute && document.currentScript.getAttribute('nonce'))) || null;
+					const existNonceEl = document.querySelector && document.querySelector('script[nonce]');
+					const detectedNonce = current || (existNonceEl && (existNonceEl.nonce || existNonceEl.getAttribute('nonce')));
+					if (detectedNonce) script.setAttribute('nonce', detectedNonce);
+				} catch (_) {}
+				script.onload = () => {
+					if (applyMap()) {
+						console.log('📝 API_SIGN_MAP 动态注入完成');
+					}
+					window.__SIGN_MAP_LOADING__ = false;
+				};
+				script.onerror = () => {
+					console.warn('⚠️  无法加载 ../../config/api-sign-map.js，请检查路径与 CSP');
+					window.__SIGN_MAP_LOADING__ = false;
+				};
+				document.head.appendChild(script);
+				console.warn('ℹ️  API_SIGN_MAP 未预加载，已尝试动态注入 ../../config/api-sign-map.js');
+			}
+		} catch (e) {
+			console.error('❌ 加载 API_SIGN_MAP 失败:', e && e.message || e);
+		}
+	})();
+
+	// 结束主 IIFE
+})();
+
+// ========== RPX polyfill (global) ==========
+// 在本文件外单独初始化 rpx 支持，便于在所有页面生效
+(function(){
+	try {
+		var DESIGN_WIDTH = 750;
+		var sroot = document.createElement('style');
+		sroot.setAttribute('data-rpx-vars','1');
+		sroot.textContent = ':root{--rpx:calc(100vw/' + DESIGN_WIDTH + ');}';
+		document.head && document.head.appendChild(sroot);
+
+		var REX = /([0-9]+(?:\.[0-9]+)?)rpx\b/g;
+		var MARK = 'data-rpx-processed';
+
+		function convertCss(css) { if (!css || css.indexOf('rpx') === -1) return null; return css.replace(REX, function(_, n){ return 'calc(' + n + ' * var(--rpx))'; }); }
+
+		Array.prototype.slice.call(document.querySelectorAll('style')).forEach(function(st){ try { if (st.getAttribute(MARK)) return; var out = convertCss(st.textContent); if (out) { var el = document.createElement('style'); el.setAttribute(MARK,'1'); el.textContent = out; document.head.appendChild(el); } st.setAttribute(MARK,'1'); } catch(_){} });
+
+		Array.prototype.slice.call(document.querySelectorAll('link[rel="stylesheet"]')).forEach(function(link){ try { if (link.getAttribute(MARK)) return; var href = link.href; if (!href) return; var same = (new URL(href, location.href)).origin === location.origin; if (!same) return; fetch(href, {cache:'no-cache'}).then(function(r){ return r.text(); }).then(function(css){ try { var out = convertCss(css); if (out) { var el = document.createElement('style'); el.setAttribute(MARK,'1'); el.textContent = out; document.head.appendChild(el); } link.setAttribute(MARK,'1'); } catch(_){} }).catch(function(){}); } catch(_){} });
+
+		try { var mo = new MutationObserver(function(muts){ muts.forEach(function(m){ Array.prototype.slice.call(m.addedNodes||[]).forEach(function(node){ try { if (!node) return; if (node.tagName === 'STYLE' && !node.getAttribute(MARK)) { var out = convertCss(node.textContent); if (out) { var el = document.createElement('style'); el.setAttribute(MARK,'1'); el.textContent = out; document.head.appendChild(el); } node.setAttribute(MARK,'1'); } else if (node.tagName === 'LINK' && node.rel === 'stylesheet' && !node.getAttribute(MARK)) { var href2 = node.href; if (!href2) return; var same2 = (new URL(href2, location.href)).origin === location.origin; if (!same2) return; fetch(href2, {cache:'no-cache'}).then(function(r){ return r.text(); }).then(function(css){ try { var out = convertCss(css); if (out) { var el = document.createElement('style'); el.setAttribute(MARK,'1'); el.textContent = out; document.head.appendChild(el); } node.setAttribute(MARK,'1'); } catch(_){} }).catch(function(){}); } } catch(_){} }); }); }); mo.observe(document.head || document.documentElement, { childList:true, subtree:true }); } catch(_){}
+	} catch(e) { try { console.warn('rpx polyfill error', e); } catch(_){} }
 })();
 
