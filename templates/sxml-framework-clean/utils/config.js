@@ -18,9 +18,34 @@
   // 初始化全局配置为默认值
   window.API_CONFIG = Object.assign({}, DEFAULT_CONFIG);
 
+  // 主题切换 API：暴露到全局，供页面调用
+  window.setAppTheme = function(mode) {
+    try {
+      const m = (mode || '').toString().toLowerCase();
+      // 同步在 documentElement 与 body 上设置 class，避免作用域不一致导致切换失败
+      const root = document.documentElement;
+      const body = document.body;
+      if (m === 'day' || m === 'light') {
+        try { if (root && !root.classList.contains('theme-day')) root.classList.add('theme-day'); } catch(_) {}
+        try { if (body && !body.classList.contains('theme-day')) body.classList.add('theme-day'); } catch(_) {}
+      } else {
+        try { if (root && root.classList.contains('theme-day')) root.classList.remove('theme-day'); } catch(_) {}
+        try { if (body && body.classList.contains('theme-day')) body.classList.remove('theme-day'); } catch(_) {}
+      }
+      try { localStorage.setItem('app.theme', m); } catch (_) {}
+    } catch (e) {
+      console.warn('setAppTheme failed', e);
+    }
+  };
+
   // 异步加载外部配置并合并（仅 JS；无 JSON 请求）
   (async function loadExternalConfig() {
-    const configUrl = window.APP_CONFIG_URL || '../../config/app.config.js';
+    let configUrl = window.APP_CONFIG_URL || '../../config/app.config.js';
+    
+    // 确保 URL 以 .js 结尾（避免误加载 .json）
+    if (!/\.js($|[?#])/i.test(configUrl)) {
+      configUrl = configUrl.replace(/\.json($|[?#])/i, '.js$1');
+    }
 
     // 应用配置到全局（避免重复代码）
     const applyAppConfig = (appConfig) => {
@@ -30,6 +55,11 @@
         window.API_CONFIG.BASE_URL = appConfig.api.baseUrl;
       }
       window.APP_CONFIG = appConfig;
+      // 如果配置中包含 theme 或 themeMode，优先应用
+      try {
+        const themeVal = (appConfig.theme || appConfig.themeMode || '').toString();
+        if (themeVal) window.setAppTheme(themeVal.toLowerCase());
+      } catch (_) {}
       console.log('📡 API_CONFIG 已加载:', window.API_CONFIG);
       return true;
     };
@@ -66,6 +96,18 @@
       console.log('📡 API_CONFIG（默认）:', window.API_CONFIG);
     }
   })();
+
+  // 页面初始时恢复主题：localStorage 优先，其次尝试使用 window.APP_CONFIG，再次尝试系统首选项
+  try {
+    const stored = (function(){ try { return localStorage.getItem('app.theme'); } catch(_) { return null } })();
+    if (stored) {
+      window.setAppTheme(stored);
+    } else if (window.APP_CONFIG && (window.APP_CONFIG.theme || window.APP_CONFIG.themeMode)) {
+      window.setAppTheme((window.APP_CONFIG.theme || window.APP_CONFIG.themeMode).toString().toLowerCase());
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      window.setAppTheme('day');
+    }
+  } catch (_) {}
 
   // 加载 API 签名映射（带回退动态加载）
   (function loadSignMap() {

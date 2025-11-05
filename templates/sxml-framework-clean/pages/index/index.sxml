@@ -1,0 +1,21 @@
+<!-- 首页入口（SXML）-->
+
+<view class="container">
+  <view class="hero">
+    <view class="logo" s:if="{{APP_LOGO}}">
+      <image :src="APP_LOGO" :alt="APP_TITLE" />
+    </view>
+    <view class="title">{{ APP_TITLE }}</view>
+    <view class="subtitle">{{ APP_SUBTITLE }}</view>
+    <view class="desc" s:if="{{ APP_DESC }}">{{ APP_DESC }}</view>
+  </view>
+
+  <view class="actions">
+    <button class="primary" bindtap="goLogin">登录</button>
+    <button class="secondary" bindtap="goMyInfo">我的信息</button>
+  </view>
+
+  <view class="footnote">
+    <text>© {{ CURRENT_YEAR }} {{ APP_NAME }}</text>
+  </view>
+</view>
